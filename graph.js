@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 var graph = require('@microsoft/microsoft-graph-client');
 require('isomorphic-fetch');
 
@@ -11,9 +14,11 @@ module.exports = {
       .get();
     return user;
   },
+
+  // <GetCalendarViewSnippet>
   getCalendarView: async function(msalClient, userId, start, end, timeZone) {
     const client = getAuthenticatedClient(msalClient, userId);
-  
+
     return client
       .api('/me/calendarview')
       // Add Prefer header to get back times in user's timezone
@@ -31,9 +36,12 @@ module.exports = {
       .top(50)
       .get();
   },
+  // </GetCalendarViewSnippet>
+
+  // <CreateEventSnippet>
   createEvent: async function(msalClient, userId, formData, timeZone) {
     const client = getAuthenticatedClient(msalClient, userId);
-  
+
     // Build a Graph event
     const newEvent = {
       subject: formData.subject,
@@ -50,7 +58,7 @@ module.exports = {
         content: formData.body
       }
     };
-  
+
     // Add attendees if present
     if (formData.attendees) {
       newEvent.attendees = [];
@@ -63,12 +71,13 @@ module.exports = {
         });
       });
     }
-  
+
     // POST /me/events
     await client
       .api('/me/events')
       .post(newEvent);
   },
+  // </CreateEventSnippet>
 };
 
 function getAuthenticatedClient(msalClient, userId) {

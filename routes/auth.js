@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 const router = require('express-promise-router')();
 const graph = require('../graph');
 
@@ -25,6 +28,7 @@ router.get('/signin',
   }
 );
 
+// <CallbackSnippet>
 router.get('/callback',
   async function(req, res) {
     const tokenRequest = {
@@ -61,6 +65,7 @@ router.get('/callback',
     res.redirect('/');
   }
 );
+// </CallbackSnippet>
 
 router.get('/signout',
   async function(req, res) {

@@ -31,6 +31,31 @@ app.use(express.json());
 
 // app.use('/api/v1', api);
 
+app.locals.users = {};
+
+// MSAL config
+const msalConfig = {
+  auth: {
+    clientId: process.env.OAUTH_CLIENT_ID,
+    authority: process.env.OAUTH_AUTHORITY,
+    clientSecret: process.env.OAUTH_CLIENT_SECRET
+  },
+  system: {
+    loggerOptions: {
+      loggerCallback(loglevel, message, containsPii) {
+        console.log(message);
+      },
+      piiLoggingEnabled: false,
+      logLevel: msal.LogLevel.Verbose,
+    }
+  }
+};
+
+// Create msal application object
+app.locals.msalClient = new msal.ConfidentialClientApplication(msalConfig);
+
+
+
 // Flash middleware
 app.use(flash());
 // Session middleware
@@ -68,29 +93,14 @@ app.use(function(req, res, next) {
 // In-memory storage of logged-in users
 // For demo purposes only, production apps should store
 // this in a reliable storage
-app.locals.users = {};
 
-// MSAL config
-const msalConfig = {
-  auth: {
-    clientId: process.env.OAUTH_CLIENT_ID,
-    authority: process.env.OAUTH_AUTHORITY,
-    clientSecret: process.env.OAUTH_CLIENT_SECRET
-  },
-  system: {
-    loggerOptions: {
-      loggerCallback(loglevel, message, containsPii) {
-        console.log(message);
-      },
-      piiLoggingEnabled: false,
-      logLevel: msal.LogLevel.Verbose,
-    }
-  }
-};
 
-// Create msal application object
-app.locals.msalClient = new msal.ConfidentialClientApplication(msalConfig);
 
+
+
+//view engine
+app.set('views',path.join(__dirname,'views'));
+app.set('view engine','hbs');
 
 
 var hbs = require('hbs');
@@ -101,10 +111,6 @@ hbs.registerHelper('eventDateTime', function(dateTime) {
   const date = parseISO(dateTime);
   return formatDate(date, 'M/d/yy h:mm a');
 });
-
-//view engine
-app.set('views',path.join(__dirname,'views'));
-app.set('view engine','hbs');
 
 app.use('/',indexRouter)
 app.use('/users',usersRouter)
